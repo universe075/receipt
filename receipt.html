@@ -13,6 +13,7 @@
       font-display: swap;
   }
 
+  /* ✅ 하단 문구 전용 폰트 */
   @font-face {
       font-family: 'GangwonEducationSaeum';
       src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2201-2@1.0/GangwonEduSaeeum_OTFMediumA.woff') format('woff');
@@ -23,27 +24,30 @@
   body {
     font-family: 'Noto Sans KR', sans-serif;
     background:#f0f0e8;
-    padding:20px;
+    padding:40px 0;
     display:flex;
     flex-direction:column;
     align-items:center;
   }
 
-  /* ===== 레이아웃 ===== */
-  .container{
-    display:flex;
-    align-items:flex-start;
-    justify-content:center;
-    gap:20px;
-    flex-wrap:wrap;
-  }
+/* ===== 레이아웃 ===== */
+.container{
+  display:flex;
+  align-items:flex-start;
+  gap:20px;
+  /* 💡 가운데 정렬 */
+  justify-content:center;
+  flex-wrap:wrap; /* 넓으면 가로, 좁으면 자동 줄바꿈 */
+}
 
-  @media (max-width: 1000px){
-    .container{
-      flex-direction:column;
-      align-items:center;
-    }
+/* 💡 화면 너비가 1000px 미만이면 세로 배치 */
+@media (max-width: 1000px){
+  .container{
+    flex-direction:column;
+    align-items:center;
   }
+}
+
 
   .receipt {
     position: relative;
@@ -57,20 +61,28 @@
 
   .receipt::before,
   .receipt::after {
-    content:''; position:absolute; left:50%;
-    width:80%; height:20px; background:#f0f0e8;
-    border-top:4px solid #3c6b4f; border-bottom:4px solid #3c6b4f;
-    border-radius:20px; transform:translateX(-50%); z-index:1;
+    content:'';
+    position:absolute;
+    left:50%;
+    width:80%;
+    height:20px;
+    background:#f0f0e8;
+    border-top:4px solid #3c6b4f;
+    border-bottom:4px solid #3c6b4f;
+    border-radius:20px;
+    transform:translateX(-50%);
+    z-index:1;
   }
   .receipt::before { top:-12px; }
   .receipt::after  { bottom:-12px; }
 
   .content {
     padding:30px 20px 20px 20px;
-    position:relative; z-index:2;
+    position:relative;
+    z-index:2;
   }
 
-  /* 제목 */
+  /* Receipt 전용 폰트/굵기 */
   h1 {
     text-align:center;
     color:#3c6b4f;
@@ -80,53 +92,85 @@
     font-size: 2em;
   }
 
-  table { width:100%; margin-top:10px; border-collapse: collapse; }
-  th, td { text-align:center; padding:6px 0; }
-  th { border-top:2px solid #3c6b4f; border-bottom:2px solid #3c6b4f; }
-  tbody tr:last-child td { border-bottom:2px solid #3c6b4f; }
-  tbody td { font-size:0.9em; }
+  table {
+    width:100%;
+    margin-top:10px;
+    border-collapse: collapse;
+    border-spacing: 0;       /* ✅ 셀 간 간격 통일 */
+  }
+  th, td {
+    text-align:center;
+    padding:4px 0;
+  }
+  th {
+    border-top:2px solid #3c6b4f;
+    border-bottom:2px solid #3c6b4f;
+  }
+  tbody tr:last-child td {
+    border-bottom:2px solid #3c6b4f;
+  }
 
-  .total { margin-top:20px; text-align:right; font-weight:bold; color:#3c6b4f; }
+  /* ✅ 본문 데이터(테이블 바디) */
+  tbody td { font-size: 0.8em; }
 
-  /* 하단 문구 */
+  /* ✅ 날짜 구분선 : 일반 행과 동일한 간격 */
+  .date-separator td {
+    padding:0;
+    border-top:1px dashed rgba(60,107,79,0.6);
+  }
+
+  .total {
+    margin-top:20px;
+    text-align:right;
+    font-weight:bold;
+    color:#3c6b4f;
+  }
+
+  /* ✅ 하단 문구 스타일 */
   .bottom-msg {
     text-align:center;
     color:#3c6b4f;
     font-family: 'GangwonEducationSaeum', cursive;
     font-size: 1.1em;
-    margin-top: 8px;
+    margin-top: 6px;
   }
 
-  /* 입력 폼 */
   .form-controls {
-    display:flex; flex-direction:column; align-items:flex-start;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
     font-weight:500;
   }
   .form-controls label { margin-top:8px; }
   .form-controls input {
-    margin-top:4px; margin-bottom:12px;
-    width:200px; padding:6px;
+    margin-top:4px;
+    margin-bottom:12px;
+    width: 200px;
+    padding:6px;
     font-family: 'Noto Sans KR', sans-serif;
   }
   .form-controls button {
-    margin:6px 4px 0 0; padding:6px 12px;
+    margin:6px 4px 0 0;
+    padding:6px 12px;
     font-family: 'Noto Sans KR', sans-serif;
-    background:#3c6b4f; color:#fff;
-    border:none; border-radius:6px; cursor:pointer;
+    background:#3c6b4f;
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
   }
   .form-controls button:hover { background:#2f543d; }
 
-  .date-separator td {
-    border-top:1px dashed rgba(60,107,79,0.5);
-    height:0; padding:0;
+  .delete-btn{
+    background:#d9534f;
+    color:#fff;
+    border:none;
+    border-radius:4px;
+    padding:2px 6px;
+    cursor:pointer;
+    font-size:0.8em;
   }
-
-  .delete-btn {
-    background:#d9534f; color:#fff; border:none;
-    border-radius:4px; padding:2px 6px;
-    cursor:pointer; font-size:0.8em;
-  }
-  .delete-btn:hover{ background:#c9302c; }
+  .delete-btn:hover{background:#c9302c;}
 </style>
 </head>
 <body>
@@ -171,14 +215,16 @@ let entries = [];
 function addItem(){
   const date  = document.getElementById('date').value.trim();
   const item  = document.getElementById('item').value.trim();
-  const count = parseInt(document.getElementById('count').value,10);
+  const countValue = document.getElementById('count').value.trim();
+  const count = parseInt(countValue,10);
 
-  if(!date || !item || isNaN(count)){
+  // ✅ 금액이 비어있거나 숫자가 아닐 때만 경고 (0도 허용)
+  if(!date || !item || countValue === '' || isNaN(count)){
     alert("날짜·내용·금액을 모두 입력하세요");
     return;
   }
 
-  const id = Date.now();
+  const id = Date.now(); // 고유 ID
   entries.push({id, date, item, count});
   renderTable();
 }
@@ -187,6 +233,7 @@ function renderTable(){
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
 
+  // 합계 다시 계산
   total = 0;
   entries.sort((a,b) => a.date.localeCompare(b.date));
   let lastDate = "";
@@ -202,13 +249,14 @@ function renderTable(){
     tr.innerHTML = `
       <td>${e.date}</td>
       <td>${e.item}</td>
-      <td>${e.count.toLocaleString()}</td>
+      <td>${e.count.toLocaleString()}</td>  <!-- ✅ 1,000단위 콤마 -->
       <td><button class="delete-btn" onclick="deleteItem(${e.id})">삭제</button></td>`;
     tbody.appendChild(tr);
     total += e.count;
     lastDate = e.date;
   });
 
+  // ✅ 합계에도 콤마 표시
   document.getElementById('total').textContent = total.toLocaleString();
 }
 
@@ -219,23 +267,30 @@ function deleteItem(id){
 
 function downloadImage(){
   const receipt = document.getElementById("receipt");
+
+  // ✅ “삭제” 열(헤더 + 각 행) 전체 숨기기
   const delHeader = document.querySelector('th:last-child');
   const delCells  = document.querySelectorAll('td:last-child');
   if(delHeader) delHeader.style.display = 'none';
   delCells.forEach(td => td.style.display = 'none');
 
-  html2canvas(receipt, { backgroundColor:'#ffffff', useCORS:true })
-    .then(canvas => {
-      const link = document.createElement('a');
-      link.download = 'receipt.png';
-      link.href = canvas.toDataURL("image/png");
-      link.click();
+  html2canvas(receipt, {
+    backgroundColor: '#ffffff',
+    useCORS: true
+  }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = 'receipt.png';                // ✅ PNG로 저장
+    link.href = canvas.toDataURL("image/png");    // ✅ PNG
+    link.click();
 
-      if(delHeader) delHeader.style.display = '';
-      delCells.forEach(td => td.style.display = '');
-    });
+    // ✅ 캡처 끝난 뒤 다시 표시
+    if(delHeader) delHeader.style.display = '';
+    delCells.forEach(td => td.style.display = '');
+  });
 }
 </script>
 
 </body>
 </html>
+
+
