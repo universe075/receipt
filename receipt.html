@@ -13,6 +13,14 @@
       font-display: swap;
   }
 
+  /* ✅ 하단 문구 전용 폰트 */
+  @font-face {
+      font-family: 'GangwonEducationSaeum';
+      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2201-2@1.0/GangwonEduSaeeum_OTFMediumA.woff') format('woff');
+      font-weight: normal;
+      font-display: swap;
+  }
+
   body {
     font-family: 'Noto Sans KR', sans-serif;
     background:#f0f0e8;
@@ -20,6 +28,19 @@
     display:flex;
     flex-direction:column;
     align-items:center;
+  }
+
+  /* ===== 레이아웃 ===== */
+  .container{
+    display:flex;
+    align-items:flex-start;
+    gap:20px;
+  }
+  @media (max-width: 768px){
+    .container{
+      flex-direction:column;
+      align-items:center;
+    }
   }
 
   .receipt {
@@ -30,7 +51,6 @@
     border-radius:12px;
     overflow:hidden;
     box-shadow:0 2px 6px rgba(0,0,0,0.15);
-    margin-left:20px;
   }
 
   .receipt::before,
@@ -63,28 +83,56 @@
     margin-bottom:8px;
     font-family: 'KccAnchangho', cursive;
     font-weight: bold;
-    font-size: 1.8em;
+    font-size: 2em;
   }
 
-  table { width:100%; margin-top:10px; border-collapse: collapse;}
-  td, th { text-align:center; padding:4px 0; }
-
-  /* 헤더 위·아래, 마지막 줄 굵은 실선 */
-  table thead tr:first-child th {
+  table {
+    width:100%;
+    margin-top:10px;
+    border-collapse: collapse;
+    border-spacing: 0;       /* ✅ 셀 간 간격 통일 */
+  }
+  th, td {
+    text-align:center;
+    padding:4px 0;
+  }
+  th {
     border-top:2px solid #3c6b4f;
     border-bottom:2px solid #3c6b4f;
   }
-  table tbody tr:last-child td {
+  tbody tr:last-child td {
     border-bottom:2px solid #3c6b4f;
   }
 
-  .total { margin-top:20px; text-align:right; font-weight:bold; color:#3c6b4f; }
+  /* ✅ 본문 데이터(테이블 바디) */
+  tbody td { font-size: 0.8em; }
+
+  /* ✅ 날짜 구분선 : 일반 행과 동일한 간격 */
+  .date-separator td {
+    padding:0;
+    border-top:1px dashed rgba(60,107,79,0.6);
+  }
+
+  .total {
+    margin-top:20px;
+    text-align:right;
+    font-weight:bold;
+    color:#3c6b4f;
+  }
+
+  /* ✅ 하단 문구 스타일 */
+  .bottom-msg {
+    text-align:center;
+    color:#3c6b4f;
+    font-family: 'GangwonEducationSaeum', cursive;
+    font-size: 1.1em;
+    margin-top: 6px;
+  }
 
   .form-controls {
     display:flex;
     flex-direction:column;
     align-items:flex-start;
-    margin-bottom:20px;
     font-weight:500;
   }
   .form-controls label { margin-top:8px; }
@@ -107,27 +155,21 @@
   }
   .form-controls button:hover { background:#2f543d; }
 
-  .date-separator td {
-    border-top:1px dashed rgba(60,107,79,0.4);
-    height:6px;
-    padding:0;
+  .delete-btn{
+    background:#d9534f;
+    color:#fff;
+    border:none;
+    border-radius:4px;
+    padding:2px 6px;
+    cursor:pointer;
+    font-size:0.8em;
   }
-
-  #preview {
-    margin-top:40px;
-    text-align:center;
-  }
-  #preview img {
-    border:1px solid #ccc;
-    max-width:320px;
-    height:auto;
-    box-shadow:0 2px 6px rgba(0,0,0,0.15);
-  }
+  .delete-btn:hover{background:#c9302c;}
 </style>
 </head>
 <body>
 
-<div style="display:flex;align-items:flex-start;">
+<div class="container">
   <div class="form-controls">
     <label>날짜</label>
     <input id="date" type="text" placeholder="00.00.00">
@@ -146,19 +188,18 @@
 
   <div id="receipt" class="receipt">
     <div class="content">
-      <h1>* Receipt *</h1>
+      <h1>[ Receipt ]</h1>
       <table id="listTable">
         <thead>
-          <tr><th>날짜</th><th>내용</th><th>금액</th></tr>
+          <tr><th>날짜</th><th>내용</th><th>금액</th><th>삭제</th></tr>
         </thead>
         <tbody id="tableBody"></tbody>
       </table>
       <p class="total">합계 <span id="total">0</span></p>
+      <p class="bottom-msg">** 불필요한 소비를 줄이자-! **</p>
     </div>
   </div>
 </div>
-
-<div id="preview"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
@@ -168,17 +209,17 @@ let entries = [];
 function addItem(){
   const date  = document.getElementById('date').value.trim();
   const item  = document.getElementById('item').value.trim();
-  const count = parseInt(document.getElementById('count').value,10);
+  const countValue = document.getElementById('count').value.trim();
+  const count = parseInt(countValue,10);
 
-  if(!date || !item || !count){
+  // ✅ 금액이 비어있거나 숫자가 아닐 때만 경고 (0도 허용)
+  if(!date || !item || countValue === '' || isNaN(count)){
     alert("날짜·내용·금액을 모두 입력하세요");
     return;
   }
 
-  entries.push({date, item, count});
-  total += count;
-
-  entries.sort((a,b) => a.date.localeCompare(b.date));
+  const id = Date.now(); // 고유 ID
+  entries.push({id, date, item, count});
   renderTable();
 }
 
@@ -186,41 +227,59 @@ function renderTable(){
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
 
+  // 합계 다시 계산
+  total = 0;
+  entries.sort((a,b) => a.date.localeCompare(b.date));
   let lastDate = "";
+
   entries.forEach(e => {
     if(lastDate && lastDate !== e.date){
       const sep = document.createElement('tr');
       sep.className = 'date-separator';
-      sep.innerHTML = '<td colspan="3"></td>';
+      sep.innerHTML = '<td colspan="4"></td>';
       tbody.appendChild(sep);
     }
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${e.date}</td><td>${e.item}</td><td>${e.count}</td>`;
+    tr.innerHTML = `
+      <td>${e.date}</td>
+      <td>${e.item}</td>
+      <td>${e.count.toLocaleString()}</td>  <!-- ✅ 1,000단위 콤마 -->
+      <td><button class="delete-btn" onclick="deleteItem(${e.id})">삭제</button></td>`;
     tbody.appendChild(tr);
+    total += e.count;
     lastDate = e.date;
   });
 
-  document.getElementById('total').textContent = total;
+  // ✅ 합계에도 콤마 표시
+  document.getElementById('total').textContent = total.toLocaleString();
+}
+
+function deleteItem(id){
+  entries = entries.filter(e => e.id !== id);
+  renderTable();
 }
 
 function downloadImage(){
   const receipt = document.getElementById("receipt");
+
+  // ✅ “삭제” 열(헤더 + 각 행) 전체 숨기기
+  const delHeader = document.querySelector('th:last-child');
+  const delCells  = document.querySelectorAll('td:last-child');
+  if(delHeader) delHeader.style.display = 'none';
+  delCells.forEach(td => td.style.display = 'none');
+
   html2canvas(receipt, {
-    backgroundColor: '#ffffff',   // ✅ 흰색 배경 강제
+    backgroundColor: '#ffffff',
     useCORS: true
   }).then(canvas => {
-    // ✅ JPEG 로 저장
     const link = document.createElement('a');
-    link.download = 'receipt.jpg';
-    link.href = canvas.toDataURL("image/jpeg", 1.0); // 최대 품질 JPEG
+    link.download = 'receipt.png';                // ✅ PNG로 저장
+    link.href = canvas.toDataURL("image/png");    // ✅ PNG
     link.click();
 
-    // ✅ 미리보기도 JPEG 로 표시
-    const preview = document.getElementById('preview');
-    preview.innerHTML = "<h3>저장된 이미지 미리보기</h3>";
-    const img = document.createElement('img');
-    img.src = canvas.toDataURL("image/jpeg", 1.0);
-    preview.appendChild(img);
+    // ✅ 캡처 끝난 뒤 다시 표시
+    if(delHeader) delHeader.style.display = '';
+    delCells.forEach(td => td.style.display = '');
   });
 }
 </script>
